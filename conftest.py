@@ -1,10 +1,11 @@
-import pytest
 from selene.support.shared import browser
+import pytest
 
 
-@pytest.fixture(scope='session')
-def browser_manager():
-    browser.driver.set_window_size(1200, 900)
-    browser.open("https://demoqa.com")
+@pytest.fixture(scope="function", autouse=True)
+def init_browser():
+    browser.config.base_url = 'https://demoqa.com'
+    browser.config.window_width = 1920
+    browser.config.window_height = 1080
     yield
     browser.quit()
