@@ -1,14 +1,21 @@
-from imghdr import tests
-
 from selene import have, command
 from selene.support.shared import browser
 
 import resource
+from data.users import Users
 
 
 class RegistrationPage:
-    def __int__(self):
-        pass
+
+    def __init__(self, user: Users):
+        self.first_name = browser.element("#firstName")
+        self.last_name = browser.element("#lastName")
+        self.email = browser.element("#userEmail")
+        self.gender = browser.element(f'[value="{user.gender.name}"] + label')
+        self.phone = browser.element("#userNumber")
+        self.subject = browser.element("#subjectsInput")
+        self.hobby = browser.all("[for^=hobbies]").element_by(have.exact_text(f"{user.hobby.name}"))
+        self.address = browser.element("#currentAddress")
 
     def open(self):
         browser.open("/automation-practice-form")
@@ -17,26 +24,6 @@ class RegistrationPage:
         )
         browser.all('[id^=google_ads][id$=container__]').perform(command.js.remove)
         browser.all('#footer').perform(command.js.remove)
-        return self
-
-    def fill_first_name(self, value):
-        browser.element("#firstName").type(value)
-        return self
-
-    def fill_last_name(self, value):
-        browser.element("#lastName").type(value)
-        return self
-
-    def fill_email(self, value):
-        browser.element("#userEmail").type(value)
-        return self
-
-    def choose_gender(self, value):
-        browser.element(f'[value={value}] + label').click()
-        return self
-
-    def add_mobile_phone(self, value):
-        browser.element("#userNumber").type(value)
         return self
 
     def fill_date_of_birth(self, year, month, day):
@@ -48,20 +35,8 @@ class RegistrationPage:
         ).click()
         return self
 
-    def fill_subject(self, value):
-        browser.element("#subjectsInput").type(value).press_enter()
-        return self
-
-    def choose_hobbies(self, value):
-        browser.all("[for^=hobbies]").element_by(have.exact_text(value)).click()
-        return self
-
     def upload_photo(self, picture):
         browser.element('#uploadPicture').set_value(resource.path(picture))
-        return self
-
-    def fill_state(self, value):
-        browser.element("#currentAddress").type(value)
         return self
 
     def choose_state_and_city(self, state, city):
@@ -75,30 +50,36 @@ class RegistrationPage:
         browser.element("#submit").press_enter()
         return self
 
-    def should_have(
-            self,
-            full_name,
-            email,
-            gender,
-            phone,
-            birthday,
-            subject,
-            hobby,
-            picture,
-            address,
-            state_and_city,
-    ):
+    def register(self, user: Users):
+        self.first_name.type(user.first_name)
+        self.last_name.type(user.last_name)
+        self.email.type(user.email)
+        self.gender.click()
+        self.phone.type(user.phone)
+        self.fill_date_of_birth(
+            user.date_of_birth.strftime("%Y"),
+            user.date_of_birth.strftime("%B"),
+            user.date_of_birth.strftime("%d"),
+        )
+        self.subject.type(user.subject).press_enter()
+        self.hobby.click()
+        self.upload_photo(user.picture)
+        self.address.type(user.address)
+        self.choose_state_and_city(user.state, user.city)
+        self.submit()
+
+    def should_have_registered(self, user: Users):
         browser.all(".table").all("td").should(
             have.exact_texts(
-                ("Student Name", full_name),
-                ("Student Email", email),
-                ("Gender", gender),
-                ("Mobile", phone),
-                ("Date of Birth", birthday),
-                ("Subjects", subject),
-                ("Hobbies", hobby),
-                ("Picture", picture),
-                ("Address", address),
-                ("State and City", state_and_city),
+                ("Student Name", f'{user.first_name} {user.last_name}'),
+                ("Student Email", user.email),
+                ("Gender", user.gender.name),
+                ("Mobile", user.phone),
+                ("Date of Birth", user.date_of_birth.strftime('%d %B,%Y')),
+                ("Subjects", user.subject),
+                ("Hobbies", user.hobby.name),
+                ("Picture", user.picture),
+                ("Address", user.address),
+                ("State and City", f'{user.state} {user.city}'),
             )
         )
