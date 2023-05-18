@@ -4,7 +4,7 @@ from selene.support.shared import browser
 
 class LeftPanel:
 
-    def __int__(self):
+    def __init__(self):
         self.left_panel = browser.element('.left-pannel')
 
     def open_form(self, group, item):
