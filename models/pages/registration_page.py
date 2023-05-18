@@ -1,10 +1,7 @@
 import os
-from imghdr import tests
-
 from selene import have, command
 from selene.support.shared import browser
 
-import resource
 
 
 class RegistrationPage:
