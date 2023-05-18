@@ -58,9 +58,7 @@ class RegistrationPage:
         return self
 
     def upload_photo(self, picture):
-        project_root_path = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        )
+        project_root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         resources_path = os.path.join(project_root_path, "tests", "resources")
         browser.element("#uploadPicture").type(f"{resources_path}/{picture}")
         return self
